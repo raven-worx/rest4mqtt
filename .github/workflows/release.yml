@@ -94,12 +94,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Generate Changelog
-        id: changelog
-        uses: metcalfc/changelog-generator@v4.1.0
-        with:
-          myToken: ${{ secrets.GITHUB_TOKEN }}
-      
       - name: Create Release
         id: create-release
         uses: actions/create-release@v1
@@ -109,8 +103,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{needs.build-artifacts.outputs.version}}
           body: |
-            ${{ steps.changelog.outputs.changelog }}
-            
             ## Install/Update
             
             ```console
