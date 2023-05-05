@@ -1,0 +1,16 @@
+[Unit]
+Description=REST4MQTT service
+After=network.target
+StartLimitIntervalSec=1
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+WorkingDirectory=/usr/local/rest4mqtt/
+ConfigurationDirectory=rest4mqtt
+ExecStart=/usr/local/rest4mqtt/rest4mqtt.py
+
+[Install]
+WantedBy=multi-user.target

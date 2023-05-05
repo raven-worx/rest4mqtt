@@ -1,0 +1,2 @@
+*.py		text eol=lf
+deb/**		text eol=lf
