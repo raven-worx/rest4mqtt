@@ -41,15 +41,18 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
 
 	def do_HEAD(self):
 		self.send_response(405) # Method Not Allowed
+		self.send_header('Connection', 'close')
 		self.end_headers()
 	
 	def do_POST(self):
 		if self.server.need_auth() and not self.headers.get('Authorization'):
 			self.send_response(401) # Unauthorized
 			self.send_header('WWW-Authenticate', 'Basic realm="REST4MQTT"')
+			self.send_header('Connection', 'close')
 			self.end_headers()
 		if not self.server.check_auth(self.headers.get('Authorization')):
 			self.send_response(403) # Forbidden
+			self.send_header('Connection', 'close')
 			self.end_headers()
 		elif self.path in pub_topics:
 			length = int(self.headers.get('content-length', 0))
@@ -57,40 +60,50 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
 			logger.debug("http POST: len: %d, data: %s", length, payload)
 			ret = self.server.mqtt_publish(self.path[1:], payload)
 			self.send_response(ret)
+			self.send_header('Connection', 'close')
 			self.end_headers()
 		else:
 			logger.warning("POST '%s' not found", self.path)
 			self.send_response(404) # Not Found
+			self.send_header('Connection', 'close')
 			self.end_headers()
 	
 	def do_GET(self):
 		if self.server.need_auth() and not self.headers.get('Authorization'):
 			self.send_response(401) # Unauthorized
 			self.send_header('WWW-Authenticate', 'Basic realm="REST4MQTT"')
+			self.send_header('Connection', 'close')
 			self.end_headers()
 		if not self.server.check_auth(self.headers.get('Authorization')):
 			self.send_response(403) # Forbidden
+			self.send_header('Connection', 'close')
 			self.end_headers()
 		elif self.path in data_cache:
 			logger.debug("GET '%s':\n%s", self.path, str(data_cache[self.path]))
 			if data_cache[self.path] is None:
 				self.send_response(204) # No Content
+				self.send_header('Connection', 'close')
 				self.end_headers()
 			else:
+				response_data = data_cache[self.path].encode('utf8')
 				self.send_response(200) # OK
+				self.send_header('Content-length', str(len(response_data)))
+				self.send_header('Connection', 'close')
 				self.end_headers()
-				self.wfile.write(data_cache[self.path].encode('utf8'))
+				self.wfile.write(response_data)
 		else:
 			logger.warning("GET '%s' not found", self.path)
 			self.send_response(404) # Not Found
+			self.send_header('Connection', 'close')
 			self.end_headers()
 	
 	def do_DELETE(self):
 		self.send_response(405) # Method Not Allowed
+		self.send_header('Connection', 'close')
 		self.end_headers()
 
 
-class CustomHTTPServer(HTTPServer):
+class CustomHTTPServer(ThreadingMixIn, HTTPServer):
 	auth = None
 	mqtt_client = None
 	
