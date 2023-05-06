@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S python3 -u
 
 from socketserver import ThreadingMixIn
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 import paho.mqtt.client as mqtt
 import logging
+import threading
 import os
 import sys
 import traceback
@@ -103,9 +104,10 @@ class CustomHTTPServer(HTTPServer):
 		if not username and not password:
 			return
 		self.auth = "Basic " + base64.b64encode(bytes('%s:%s' % (username, password), 'utf-8')).decode('ascii')
+		logger.debug("set_auth: '{}:{}' -> {}".format(username,password,self.auth))
 	
 	def check_auth(self, auth):
-		if not self.need_auth:
+		if not self.need_auth():
 			return True
 		elif auth == None:
 			return False
@@ -136,8 +138,8 @@ def main():
 	logger.setLevel(logging.INFO)
 	
 	# CONFIG
-	conf_path = os.getenv("CONFIGURATION_DIRECTORY") + "/rest4mqtt/conf.ini"
-	logger.debug("config file: " + conf_path)
+	conf_path = os.getenv("CONFIGURATION_DIRECTORY") + "/conf.ini"
+	logger.info("config file: " + conf_path)
 	config = configparser.ConfigParser()
 	config.read(conf_path)
 	

@@ -106,7 +106,7 @@ jobs:
             ## Install/Update
             
             ```console
-            wget -O /tmp/rest4mqtt.deb https://github.com/raven-worx/rest4mqtt/releases/download/${{needs.build-artifacts.outputs.version}}/rest4mqtt_${{needs.build-artifacts.outputs.version_num}}.deb
+            wget -O /tmp/rest4mqtt.deb https://github.com/raven-worx/rest4mqtt/releases/download/${{needs.build-artifacts.outputs.version}}/rest4mqtt_${{needs.build-artifacts.outputs.version_num}}_all.deb
             sudo apt update
             sudo apt install /tmp/rest4mqtt.deb
             ```

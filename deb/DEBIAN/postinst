@@ -2,5 +2,5 @@
 set -e
 
 systemctl --system daemon-reload >/dev/null || true
-systemctl --system enable loveboxpi >/dev/null || true
-systemctl --system restart loveboxpi >/dev/null || true
+systemctl --system enable rest4mqtt >/dev/null || true
+systemctl --system restart rest4mqtt >/dev/null || true
