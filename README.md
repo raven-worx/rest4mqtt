@@ -29,7 +29,7 @@ For install instructions using a Debian package (Debian, Ubuntu, RaspberryPi, ..
 Edit the settings file and afterwards restart the system service:
 
 ````
-sudo nano /etc/rest4mqtt/rest4mqtt.ini
+sudo nano /etc/rest4mqtt/rest4mqtt.conf
 sudo systemctl restart rest4mqtt.service
 ````
 
