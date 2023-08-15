@@ -151,7 +151,7 @@ def main():
 	logger.setLevel(logging.INFO)
 	
 	# CONFIG
-	conf_path = os.getenv("CONFIGURATION_DIRECTORY") + "/conf.ini"
+	conf_path = os.getenv("CONFIGURATION_DIRECTORY") + "/rest4mqtt.conf"
 	logger.info("config file: " + conf_path)
 	config = configparser.ConfigParser()
 	config.read(conf_path)

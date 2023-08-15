@@ -26,10 +26,10 @@ For install instructions using a Debian package (Debian, Ubuntu, RaspberryPi, ..
 | sub                   |               | A whitespace separated list of topics on the broker which should be accessible via HTTP GET requests. Multiline entries are supported, just use the same indentation for each entry |
 | pub                   |               | A whitespace separated list of topics on the broker which should be publishable via HTTP POST requests. Multiline entries are supported, just use the same indentation for each entry | 
 
-Edit the settings file and afterwards restart the system service.
+Edit the settings file and afterwards restart the system service:
 
 ````
-sudo nano /etc/rest4mqtt/conf.ini
+sudo nano /etc/rest4mqtt/rest4mqtt.ini
 sudo systemctl restart rest4mqtt.service
 ````
 
