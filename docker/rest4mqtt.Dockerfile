@@ -16,8 +16,8 @@ RUN set -ex \
     && apt clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo -n $version > /usr/local/rest4mqtt/VERSION
 COPY rest4mqtt.py /usr/local/rest4mqtt/
+RUN echo -n $version > /usr/local/rest4mqtt/VERSION
 
 WORKDIR /usr/local/rest4mqtt/
 ENTRYPOINT ["python3", "/usr/local/rest4mqtt/rest4mqtt.py"]
