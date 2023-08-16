@@ -154,7 +154,12 @@ def main():
 	conf_path = os.getenv("CONFIGURATION_DIRECTORY") + "/rest4mqtt.conf"
 	logger.info("config file: " + conf_path)
 	config = configparser.ConfigParser()
-	config.read(conf_path)
+	try:
+		with open(conf_path) as f:
+			config.read_file(f)
+	except IOError as e:
+		logger.error("unable to read config file: '" + conf_path + "' (check if CONFIGURATION_DIRECTORY env variable is set correctly)")
+		raise e
 	
 	www_address = config['www'].get('host', fallback='0.0.0.0')
 	www_port = config['www'].getint('port', fallback=8080)
