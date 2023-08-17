@@ -33,7 +33,7 @@ logger.addHandler(handler)
 ### MQTT
 def on_mqtt_message(client, userdata, message):
 	logger.debug("mqtt message received: topic='%s', message='%s' qos=%d, retain=%d", message.topic, str(message.payload.decode("utf-8")), message.qos, message.retain)
-	data_cache["/"+message.topic] = str(message.payload.decode("utf-8"))
+	data_cache[message.topic] = str(message.payload.decode("utf-8"))
 
 ### HTTP
 class HTTPRequestHandler(SimpleHTTPRequestHandler):
@@ -50,15 +50,16 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
 			self.send_header('WWW-Authenticate', 'Basic realm="REST4MQTT"')
 			self.send_header('Connection', 'close')
 			self.end_headers()
+		path = self.path[1:] if self.path.startswith('/') else self.path
 		if not self.server.check_auth(self.headers.get('Authorization')):
 			self.send_response(403) # Forbidden
 			self.send_header('Connection', 'close')
 			self.end_headers()
-		elif self.path in pub_topics:
+		elif path in pub_topics:
 			length = int(self.headers.get('content-length', 0))
 			payload = self.rfile.read(length).decode('utf-8')
 			logger.debug("http POST: len: %d, data: %s", length, payload)
-			ret = self.server.mqtt_publish(self.path[1:], payload)
+			ret = self.server.mqtt_publish(path, payload)
 			self.send_response(ret)
 			self.send_header('Connection', 'close')
 			self.end_headers()
@@ -74,18 +75,19 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
 			self.send_header('WWW-Authenticate', 'Basic realm="REST4MQTT"')
 			self.send_header('Connection', 'close')
 			self.end_headers()
+		path = self.path[1:] if self.path.startswith('/') else self.path
 		if not self.server.check_auth(self.headers.get('Authorization')):
 			self.send_response(403) # Forbidden
 			self.send_header('Connection', 'close')
 			self.end_headers()
-		elif self.path in data_cache:
-			logger.debug("GET '%s':\n%s", self.path, str(data_cache[self.path]))
-			if data_cache[self.path] is None:
+		elif path in data_cache:
+			logger.debug("GET '%s':\n%s", self.path, str(data_cache[path]))
+			if data_cache[path] is None:
 				self.send_response(204) # No Content
 				self.send_header('Connection', 'close')
 				self.end_headers()
 			else:
-				response_data = data_cache[self.path].encode('utf8')
+				response_data = data_cache[path].encode('utf8')
 				self.send_response(200) # OK
 				self.send_header('Content-length', str(len(response_data)))
 				self.send_header('Connection', 'close')
@@ -189,7 +191,7 @@ def main():
 			logger.warning("ignoring unsupported topic for publishing: '" + pub + "'")
 			continue
 		logger.info("enabling publishing to topic: '" + pub + "'")
-		pub_topics.add("/"+pub)
+		pub_topics.add(pub)
 	
 	for sub in mqtt_subs:
 		if not sub or "+" in sub or "#" in sub:
@@ -197,7 +199,7 @@ def main():
 			continue
 		logger.info("subscribing to topic: '" + sub + "'")
 		client.subscribe(sub)
-		data_cache["/"+sub] = None
+		data_cache[sub] = None
 	
 	# INIT HTTP
 	server = CustomHTTPServer((www_address, www_port))
