@@ -64,7 +64,7 @@ jobs:
           ARCHIVE_NAME: rest4mqtt_${{ steps.version.outputs.version_num }}.tar.gz
         id: create-archive
       - name: Upload archive artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-archive
           path: ${{ steps.create-archive.outputs.file_name }}
@@ -81,7 +81,7 @@ jobs:
           desc: 'A simple MQTT client which provides a REST interface providing the last received MQTT data'
         id: build-deb
       - name: Upload deb artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-deb
           path: ${{ steps.build-deb.outputs.file_name }}
